@@ -1,0 +1,151 @@
+---
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: arquetipojava
+  name: arquetipojava 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arquetipojava
+  template:
+    metadata:
+      labels:
+        app: arquetipojava 
+    spec:
+      containers:
+      - name: arquetipojava
+        image: israelmorales1507/arquetipojava:0.0.1
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: TZ
+          value: America/Mexico_City
+        - name: ASParquetipojava_ENVIRONMENT
+          value: Development
+        ports:
+        - containerPort: 8090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: arquetipojava
+  name: arquetipojava
+spec:
+  #type: LoadBalancer
+  ports:
+  - port: 30000
+    protocol: TCP
+    targetPort: 8090
+  selector:
+    app: arquetipojava
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: arquetipojava
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: arquetipojava
+  minReplicas: 1
+  maxReplicas: 3
+  metrics: 
+  - type: Resource 
+    resource: 
+      name: cpu 
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource 
+    resource: 
+      name: memory
+      target:
+        type: Utilization
+        averageValue: 200Mi
+---
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: arquetiponodejs
+  name: arquetiponodejs 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arquetiponodejs
+  template:
+    metadata:
+      labels:
+        app: arquetiponodejs 
+    spec:
+      containers:
+      - name: arquetiponodejs
+        image: israelmorales1507/arquetiponodejs:0.0.1
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: TZ
+          value: America/Mexico_City
+        - name: NODE_ENV
+          value: development
+        ports:
+        - containerPort: 3001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: arquetiponodejs
+  name: arquetiponodejs
+spec:
+  #type: LoadBalancer
+  ports:
+  - port: 9100
+    protocol: TCP
+    targetPort: 3001
+  selector:
+    app: arquetiponodejs
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: arquetiponodejs
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: arquetiponodejs
+  minReplicas: 1
+  maxReplicas: 3
+  metrics: 
+  - type: Resource 
+    resource: 
+      name: cpu 
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource 
+    resource: 
+      name: memory
+      target:
+        type: Utilization
+        averageValue: 200Mi
+---
